@@ -1,6 +1,6 @@
 import datetime, time
 
-global tank
+tank =0
 
 class Task:
 
@@ -36,6 +36,7 @@ class Task:
     def run(self):
 
         global timer
+        global tank
 
         if self.STATUS == "waiting":
             if self.PRIORITY == 1:
@@ -50,7 +51,31 @@ class Task:
             self.STATUS = "waiting"
 
         if self.STATUS == "running":
-            print(str(timer) + "\t=> " + self.NAME + " " + "is running")
+            if tank < 50:
+                print(str(timer) + "\t=> " + self.NAME + " " + "is running")
+                if self.NAME == "Pump 1":
+                    tank += 10
+                    self.PRIORITY += 1
+                if self.NAME == "Pump 2":
+                    tank += 20
+                    self.PRIORITY += 1
+
+                self.STATUS = "waiting"
+            else:
+                if self.NAME == "Pump 1":
+                    self.PRIORITY += 1
+                if self.NAME == "Pump 2":
+                    self.PRIORITY += 1
+                if self.NAME == "machine 1":
+                    tank -= 25
+                if self.NAME == "machine 1":
+                    tank -= 5
+                self.STATUS = "waiting"
+
+
+
+
+
         # else:
         #     print(str(timer) + "\t=> " + self.NAME + " " + str(self.EXECUTION_DONE / self.EXECUTION_TIME) + "%")
         #     time.sleep(1)
@@ -76,8 +101,8 @@ if __name__ == "__main__":
     task_list = [
         Task(NAME='Pump 1', PERIOD=5, EXECUTION_TIME=2, PRIORITY=1, STATUS="waiting"),
         Task(NAME='Pump 2', PERIOD=15, EXECUTION_TIME=3, PRIORITY=1, STATUS="waiting"),
-        Task(NAME='Machine 1', PERIOD=5, EXECUTION_TIME=5, PRIORITY=2, STATUS="waiting"),
-        Task(NAME='Machine 2', PERIOD=5, EXECUTION_TIME=3, PRIORITY=2, STATUS="waiting")]
+        Task(NAME='machine 1', PERIOD=5, EXECUTION_TIME=5, PRIORITY=1, STATUS="waiting"),
+        Task(NAME='machine 2', PERIOD=5, EXECUTION_TIME=3, PRIORITY=1, STATUS="waiting")]
 
 
     global timer
@@ -93,13 +118,16 @@ if __name__ == "__main__":
         # Choose the task to be run
         for current_task in task_list:
 
-            current_task_need_to_run = current_task.need_to_run()
+            # current_task_need_to_run = current_task.need_to_run()
 
             # Always priority to tasks that is not interruptible : Round Robin
-            if current_task_need_to_run == True and current_task.PRIORITY > task_priority:
+            if current_task.STATUS == "waiting" and current_task.PRIORITY > task_priority :
                 task_to_run = current_task
                 task_priority = current_task.PRIORITY
+                if task_priority == 2:
+                    current_task.PRIORITY =1
                 break
+
 
             # Else choose among tasks using priority
             # if current_task.IS_INTERRUPTIBLE == True and current_task_need_to_run == True and current_task.PRIORITY > task_priority:
